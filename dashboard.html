@@ -1,0 +1,142 @@
+{% extends "base.html" %} 
+{% block body%}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-size: 10px 10px, 100% 100%;
+        background-position: center;
+    }
+    
+    #about, #signup, #intro {
+        padding: 20px;
+        margin: 20px;
+        background-color: white;
+        border-radius: 5px;
+    }
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+    label, input, textarea {
+        margin: 10px 0;
+        padding: 10px;
+        font-size: 1rem;
+    }
+    input[type="submit"] {
+        background-color: #6495ED;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    input[type="submit"]:hover {
+        background-color: #45a049;
+    }
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        padding: 20px;
+        margin: 20px;
+    }
+    .grid-item {
+        background-color: white;
+        padding: 10px;
+        border-radius: 5px;
+        text-align: center;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .grid-item img {
+        width: 100%;
+        height: auto;
+        border-radius: 5px;
+        margin-top: 10px;
+    }
+    .item-name {
+        font-weight: bold;
+        font-size: 1.2em;
+        margin-bottom: 5px;
+    }
+    .item-price {
+        font-size: 1em;
+        color: #6495ED;
+        margin-top: 10px;
+    }
+</style>
+
+<body>
+
+
+
+<section id="intro">
+    <h2>Bought Art</h2>
+    <p>All Art work will be presented on this website. The price has been alocated with each image.</p>
+</section>
+
+<section class="grid-container">
+
+    {% for artwork in artworks %}
+    <div class="grid-item">
+        <div class="item-name">{{ artwork.title }}</div>
+        <img src="{{ artwork.image_url }}" alt="Artwork Image">
+        <div class="item-price"><u><b>${{ artwork.price }}</b></u></div>
+        <a href="{{ url_for('buy_art', artwork_id=artwork.id) }}" class="btn btn-success">Buy</a>
+    </div>
+    {% endfor %}
+
+    <div class="grid-item">
+        <div class="item-name">Name 1</div>
+        <img src="path/to/image.jpg" alt="INSERT">
+        <div class="item-price"><u><b>$___</b></u></div>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-success">Buy</a>
+    </div>
+
+    <div class="grid-item">
+        <div class="item-name"><u>Name 2</u></div>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/27/Emperor_penguins.jpg" alt="INSERT">
+        <div class="item-price"><b>$649.99</b></div>
+    </div>
+    <div class="grid-item">
+        <div class="item-name">Name 3</div>
+        <img src="path/to/image.jpg" alt="INSERT">
+        <div class="item-price"><u><b>$___</b></u></div>
+    </div>
+    <div class="grid-item">
+        <div class="item-name">Name 4</div>
+        <img src="path/to/image.jpg" alt="INSERT">
+        <div class="item-price"><u><b>$___</b></u></div>
+    </div>
+    <div class="grid-item">
+        <div class="item-name">Name 5</div>
+        <img src="path/to/image.jpg" alt="INSERT">
+        <div class="item-price"><u><b>$___</b></u></div>
+    </div>
+    <div class="grid-item">
+        <div class="item-name">Name 6</div>
+        <img src="path/to/image.jpg" alt="INSERT">
+        <div class="item-price"><u><b>$___</b></u></div>
+    </div>
+    <div class="grid-item">
+        <div class="item-name">Name 7</div>
+        <img src="path/to/image.jpg" alt="INSERT">
+        <div class="item-price"><u><b>$___</b></u></div>
+    </div>
+    <div class="grid-item">
+        <div class="item-name">Name 8</div>
+        <img src="path/to/image.jpg" alt="INSERT">
+        <div class="item-price"><u><b>$___</b></u></div>
+    </div>
+    <div class="grid-item">
+        <div class="item-name">Name 9</div>
+        <img src="path/to/image.jpg" alt="INSERT">
+        <div class="item-price"><u><b>$___</b></u></div>
+    </div>
+    <!-- Keep adding more for more images. Just proof of concept for now --> 
+
+</section>
+
+</body>
+
+{% endblock %}
