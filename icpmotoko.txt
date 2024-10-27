@@ -1,0 +1,59 @@
+// CODE FOR ICP BLOCKCHAIN TRACK- CIPHER & TRANSACTION FEATURE
+
+
+import Int "mo:base/Int";
+import Time "mo:base/Time";
+import Array "mo:base/Array";
+import Text "mo:base/Text";
+import Char "mo:base/Char";
+
+actor TransactionManager {
+    type Transaction = {
+        owner1: Text;
+        owner2: Text;
+        itemName: Text;
+        verificationId: Text;
+    };
+    stable var transactions: [Transaction] = [];
+private func shiftCharacters(input: Text, shift: Nat32): Text {
+    let shiftChar = func(c: Char): Char {
+        let charCode = Char.toNat32(c);
+        if (charCode >= 65 and charCode <= 90) { // Uppercase letters A-Z
+            return Char.fromNat32(((charCode - 65 + shift) % 26) + 65);
+        } else if (charCode >= 97 and charCode <= 122) { // Lowercase letters a-z
+            return Char.fromNat32(((charCode - 97 + shift) % 26) + 97);
+        } else {
+            return c; // Non-alphabetic characters remain unchanged
+        };
+    };
+    return Text.map(input, shiftChar);
+};
+    public func createTransaction(owner1: Text, owner2: Text, itemName: Text): async Text {
+        let timestamp = Int.toText(Time.now());
+        let input = owner1 # owner2 # itemName # timestamp;
+        let verificationId = shiftCharacters(input, 3); // Shift by 3 positions
+
+        //store the transaction
+        let transaction: Transaction = {
+            owner1 = owner1;
+            owner2 = owner2;
+            itemName = itemName;
+            verificationId = verificationId;
+        };
+        transactions := Array.append(transactions, [transaction]); // Using Array.append to add transaction
+
+        return verificationId;
+    };
+
+// verification ID (query method)
+public query func verifyTransaction(verificationId: Text): async Bool {
+    var i = 0;
+    while (i < transactions.size()) {
+        if (transactions[i].verificationId == verificationId) {
+            return true;
+        };
+        i += 1;
+    };
+    return false;
+};
+};
