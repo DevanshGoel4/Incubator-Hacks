@@ -1,6 +1,9 @@
-from flask import Flask, render_template, request, redirect, session, url_for, jsonify
+from flask import Flask, render_template, request, redirect, session, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+from flask_login import UserMixin
 import random
 import secrets
 
@@ -24,15 +27,11 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-# Dynamic welcome messages
-messagelist = ["Welcome, ", "Hope you’re well, ", "Let’s get cooking, ", "Let’s learn about your skin, "]
-displaymessage = random.choice(messagelist)
-
 # Artwork Model
 class Artwork(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
-    image_url = db.Column(db.String(200), nullable=False)
+    image_url = db.Column(db.String(200), nullable=True)
     price = db.Column(db.Float, nullable=False)
 
 
@@ -44,6 +43,15 @@ class Ownership(db.Model):
     user = db.relationship('User', backref=db.backref('owned_artworks', lazy=True))
     artwork = db.relationship('Artwork', backref=db.backref('owners', lazy=True))
 
+# Initialize Flask-Admin
+admin = Admin(app, name='My Admin', template_mode='bootstrap3')
+
+
+# Add views for the models
+admin.add_view(ModelView(User, db.session))
+admin.add_view(ModelView(Artwork, db.session))
+admin.add_view(ModelView(Ownership, db.session))
+
 # Assigning the ownership of art
 def assign_ownership(user_id, artwork_id):
     ownership = Ownership(user_id=user_id, artwork_id=artwork_id)
@@ -52,9 +60,10 @@ def assign_ownership(user_id, artwork_id):
 
 # Transferring the ownership to someone else
 def transfer_ownership(artwork_id, new_user_id):
-    ownership = Ownership.query.filter_by(artwork_id=artwork_id).first()
-    if ownership:
-        ownership.user_id = new_user_id
+    existing_ownership = Ownership.query.filter_by(artwork_id=artwork_id, user_id=new_user_id).first()
+    if not existing_ownership:
+        ownership = Ownership(user_id=new_user_id, artwork_id=artwork_id)
+        db.session.add(ownership)
         db.session.commit()
 
 # Making sure they have the artwork
@@ -74,6 +83,10 @@ def home():
 @app.route('/index')
 def index():
     return render_template('index.html')
+
+@app.route('/cat')
+def cat():
+    return render_template('cat.html')
 
 # Login
 @app.route("/login", methods =["POST"])
@@ -120,20 +133,27 @@ def register():
 def dashboard():
     if "username" not in session:
         return redirect(url_for('home'))
-    return render_template('dashboard.html', message=displaymessage, i=4)
+    
+    # Fetch all artworks to pass to the template
+    artworks = Artwork.query.all()
+    return render_template('dashboard.html', artworks=artworks, i=4)
 
 # My Art
 @app.route('/myart')
 def myart():
-    user = User.query.filter_by(username=session['username']).first()
+    user = User.query.filter_by(username=session.get('username')).first()
     if user:
         user_id = user.id
         owned_artworks = Ownership.query.filter_by(user_id=user_id).all()
+        
+        # Get the actual artworks from ownership
+        artworks = [ownership.artwork for ownership in owned_artworks]
 
-        if not owned_artworks:
-            print("No owned artworks found for user ID:", user_id)
+        return render_template('myart.html', artworks=artworks, username=user.username, message=displaymessage)
 
-        return render_template('myart.html', artworks=owned_artworks)
+# Dynamic welcome messages
+messagelist = ["Welcome, ", "Hope you’re well, ", "Let’s get cooking, "]
+displaymessage = random.choice(messagelist)
 
 # Logout
 @app.route('/logout')
@@ -158,8 +178,10 @@ def buy_art(artwork_id):
     if user:
         buyer_id = user.id
         transfer_ownership(artwork_id, buyer_id)
+        print(f"Ownership transferred: User ID {buyer_id} now owns Artwork ID {artwork_id}")
         return redirect(url_for('myart'))
 
+    print("No user found in session.")
     return redirect(url_for('home'))
 
 if __name__ in "__main__":

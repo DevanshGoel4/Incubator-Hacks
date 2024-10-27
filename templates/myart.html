@@ -2,21 +2,26 @@
 
 {% block body %}
 
-
-{% if artworks %}
-
-{% for artwork in get_owned_artworks(current_user.id) %}
-  <div>
-    <div>{{ artwork.title }}</div>
-    <img src="{{ artwork.image_url }}" alt="{{ artwork.title }}">
-    <p>Price: {{ artwork.price }}</p>
+<div class="relative bg-base-200" style="height: 250px;">
+  <div class="relative flex items-center justify-center h-full text-center">
+      <div class="max-w-md w-full">
+          <h1 class="text-5xl font-bold">{{ message }}{{ username }}!</h1>
+          <h2 class="pt-4 text-1xl">See your artworks below.</h2>
+      </div>
   </div>
-{% endfor %}
+</div>
 
+<section class="grid-container">
+{% for artwork in artworks %}
+    <div class="grid-item pt-6 px-6">
+        <div class="item-name">{{ artwork.title }}</div>
+        <img src="{{ artwork.image_url }}" alt="Artwork Image">
+        <div class="item-price"><u><b>{{ artwork.price }}</b></u></div>
+    </div>
 {% else %}
-    <p>No artworks owned.</p>
-
-{% endif %}
+    <div class='p-4'>No artworks owned.</div>
+{% endfor %}
+  </section>
 
 
 {% endblock %}
