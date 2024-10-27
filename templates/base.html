@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>name</title>
+    <title>artlink</title>
     <link href = "styles.css" rel = "stylesheet">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,10 +28,11 @@
 <body>
   <nav class="bg-base-300 p-4">
     <div class="container mx-auto flex items-center justify-between">
-        <a href="{{ url_for('home') }}" class="text-xl font-bold">name</a>
+        <a href="{{ url_for('home') }}" class="text-xl font-bold">artlink</a>
         <div class="space-x-4">
             {% if "username" in session %}
                 <a href="{{ url_for('dashboard') }}" class="btn btn-outline btn-secondary">Dashboard</a>
+                <a href="{{ url_for('myart') }}" class="btn btn-outline btn-secondary">My Art</a>
                 <a href="{{ url_for('logout') }}" class="btn btn-outline btn-primary btn-logout">Logout</a>
             {% else %}
                 <a href="{{ url_for('index') }}" class="btn btn-outline btn-secondary">Login</a>
@@ -49,7 +50,7 @@
 
     <footer class="footer footer-center bg-base-300 text-base-content p-4">
         <aside>
-            <p>Copyright © 2024 - All rights reserved by name LTD.</p>
+            <p>Copyright © 2024 - All rights reserved by artlink LTD.</p>
         </aside>
     </footer>
 
